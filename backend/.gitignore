@@ -3,3 +3,4 @@ node_modules
 .env
 
 /src/generated/prisma
+../frontend/student_Housing/_Website_Project.pdf
