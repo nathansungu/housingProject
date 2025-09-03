@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model auth {
+  id String @id @default(uuid())
+  userName String @unique
+  email String @unique
+  role String @default("customer")
+  password String
+  status String @default("active")
+  attempts Int @default(0)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  user user?
+  
+}
+
+model user {
+  id String @id @default(uuid())
+  userId String @unique
+  firstName String
+  lastName String
+  imgUrl String?
+  verified Boolean @default(false)
+  subscriptionPlan String @default("free")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  auth   auth   @relation(fields: [userId], references: [id])
+  houses houses[]
+  reviews review[]
+  history history?
+  subscription subscription?
+  contacts contacts?
+  sentMessages messages[] @relation("SentMessages")
+  receivedMessages messages[] @relation("ReceivedMessages")
+   
+
+}
+
+model subscription {
+  id String @id @default(uuid())
+  userId String @unique
+  plan String
+  startDate DateTime @default(now())
+  endDate DateTime 
+  updatedAt DateTime @updatedAt
+
+  user user @relation(fields: [userId], references: [id])
+}
+
+model contacts {
+  id String @id @default(uuid())
+  userId String @unique
+  phoneNo String? @unique
+  email String @unique
+
+  user user @relation(fields: [userId], references: [id])
+}
+
+model review {
+  id String @id @default(uuid())
+  userId  String 
+  houseId String
+  rating Int
+  comment String
+  isDeleted Boolean @default(false)
+  createdAtb DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  user   @relation(fields: [userId], references: [id])
+  house houses @relation(fields: [houseId], references: [id])
+
+}
+
+model history {
+  id String @id @default(uuid())
+  userId String @unique
+  viewedHouses Json?
+  postedHouses Json?
+  isDeleted Boolean @default(false)
+   user user @relation(fields: [userId], references: [id])
+}
+
+model houses {
+  id String @id @default(uuid())
+  landlordId String 
+  name String @unique
+  roomType String
+  roomsNumber Int
+  vacantUnits Int
+  location String
+  description String
+  pricing Int
+  waterBill Boolean
+  electricBill Boolean
+  wifi Boolean 
+  rentDeadline String
+  status String
+  isDeleted Boolean @default(false)
+
+  landlord user @relation(fields: [landlordId], references: [id])
+  pictures housePictures[]
+  reviews  review[]
+  message messages[]
+}
+
+model housePictures {
+  id String @id @default(uuid())
+  houseId String 
+  imgUrl String
+  isDeleted String
+  house houses @relation(fields: [houseId], references: [id])
+}
+
+model messages {
+  id String @id @default(uuid())
+  senderId String
+  receiverId String
+  houseId String?
+  message String
+  isRead Boolean @default(false)
+  createdAt DateTime
+  isDeleted Boolean @default(false)
+  sender   user   @relation("SentMessages", fields: [senderId], references: [id])
+  receiver user   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  house    houses? @relation(fields: [houseId], references: [id])
+}
+
