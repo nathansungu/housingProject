@@ -59,7 +59,7 @@ export const refreshToken = asyncHandler(
 
     
 export const changePassword = asyncHandler(async(req:Request, res:Response) =>{
-  const userId = req.user?.userId
+  const userId = req.userId
   const { currentPassword, newPassword } = await changePasswordValidation.parseAsync(req.body)
   const updatedAuth = await changePasswordService(userId, newPassword, currentPassword)
   if(updatedAuth) return res.status(200).json({message: "password changed successfully"})

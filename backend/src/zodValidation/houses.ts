@@ -1,22 +1,21 @@
 import {z} from "zod"
-export const addHouse = z.object({
-    landloardId: z.string(),
+export const addHouseValidation = z.object({
     name: z.string(),
     roomType: z.string(),
     roomsNumber: z.int(),
     vacantUnits: z.int(),
     location: z.string(),
     description: z.string(),
-    price: z.int(),
+    pricing: z.int(),
     waterBill: z.boolean(),
-    electictBill: z.boolean(),
+    electricBill: z.boolean(),
     wifi: z.boolean(),
     rentDeadline: z.string(),
     status: z.string(),
 
 })
 
-export const updateHouse = z.object({
+export const updateHouseValidation = z.object({
     landloardId: z.string(),
     name: z.string().optional(),
     roomType: z.string().optional(),
