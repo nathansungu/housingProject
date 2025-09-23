@@ -1,3 +1,4 @@
+import { updateHousePictures } from './../controllers/houses.controller';
 import {z} from "zod"
 export const addHouseValidation = z.object({
     name: z.string(),
@@ -32,9 +33,30 @@ export const updateHouseValidation = z.object({
 })
 
 
-export const addHousePictures = z.object({
+export const addHousePicturesValidation = z.object({
     houseId: z.string(),
     imgUrl: z.array(z.string())
 })
 
+// update house pictures
+export const updateHousePicturesValidation = z.object({
+    houseId: z.string(),
+    currentImgUrl: z.string(),
+    newImgUrl: z.string()
+})
 
+//delete imgUrl 
+
+export const deleteHousepictureValidation = z.object({
+    houseId: z.string(),
+    imgUrl: z.string()
+})
+
+export const getHousesValidation = z.object({
+    houseId: z.string().optional(),
+    landloardId: z.string().optional(),
+    name: z.string().optional(),
+    roomType: z.string().optional(),
+    description: z.string().optional(),
+    wifi: z.boolean().optional()
+})

@@ -114,9 +114,9 @@ model houses {
 
 model housePictures {
   id String @id @default(uuid())
-  houseId String 
-  imgUrl String
-  isDeleted String
+  houseId String @unique
+  imgUrl String[]
+  isDeleted String @default("false")
   house houses @relation(fields: [houseId], references: [id])
 }
 
