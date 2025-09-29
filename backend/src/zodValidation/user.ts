@@ -4,7 +4,7 @@ export const updateContacts = z.object({
     email: z.email().optional()
 })
 
-export const upateProfile = z.object({
+export const upateProfileValidation = z.object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     imgUrl: z.string().optional()
