@@ -8,6 +8,6 @@ auth.post('/login', loginUser);
 auth.post('/refresh-token', refreshToken);
 auth.post('/logout', logoutUser);
 auth.post('/change-password',verifyLogin, changePassword);
-auth.post('/forgot-password', verifyLogin,forgotPassword);
+auth.post('/forgot-password',forgotPassword);
 
 export default auth;
