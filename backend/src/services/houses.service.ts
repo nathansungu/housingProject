@@ -155,9 +155,13 @@ export const addReviewService = async (data:Prisma.reviewUncheckedCreateInput)=>
 }
 
 // get reviews for a house
-export const getReviewsService = async (houseId: string) => {
+export const getReviewsService = async (id: string) => {
   const reviews = await client.review.findMany({
-    where: { houseId },
+    where: { OR:[
+     { id:id},
+     {userId:id},
+     {houseId:id} 
+    ] },
   });
   if (!reviews) return Promise.reject(new Error("no reviews found"));
   return reviews;

@@ -134,10 +134,10 @@ export const addReview = asyncHandler(async (req: Request, res: Response) => {
   return;
 })
 
-//get reviews
+//get reviews // pass in user, review or houseid as id 
 export const getReviews = asyncHandler(async (req: Request, res: Response) => {
-  const { houseId } = await getReviewsValidation.parseAsync(req.params);
-  const reviews = await getReviewsService(houseId);
+  const { id } = await getReviewsValidation.parseAsync(req.params);
+  const reviews = await getReviewsService(id);
   if (reviews)
     res.status(200).json({ reviews });
 })
@@ -162,14 +162,7 @@ export const updateReview = asyncHandler(async (req: Request, res: Response) => 
   return;
 })
 
-//get all reviews for a user
-export const getUserReviews = asyncHandler(async (req: Request, res: Response) => {
-  const userId = req.userId;
-  const reviews = await getUserReviewsService(userId);
-  if (reviews)
-    res.status(200).json({ reviews });
-  return;
-})
+
 
 
 

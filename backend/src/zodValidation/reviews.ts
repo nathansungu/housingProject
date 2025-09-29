@@ -15,6 +15,6 @@ export const deleteReviewValidation = z.object({
     reviewId: z.string(),
 })
 export const getReviewsValidation = z.object({
-    houseId: z.string(),
+    id: z.string(),
 })
 
