@@ -1,5 +1,5 @@
 import { z} from 'zod'
-export const updateContacts = z.object({
+export const updateContactsValidation = z.object({
     phoneNo: z.string() .optional(),
     email: z.email().optional()
 })
