@@ -1,13 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Prisma } from "@prisma/client";
-import { id } from "zod/v4/locales/index.cjs";
 const client = new PrismaClient();
 
-//To do: get single house service
-//To do: get houses by landlord service
-//To do: get houses by location service
-//To do: get houses by price range service
-//
+
 export const getAllHousesService = async () => {
   const houses = await client.houses.findMany();
   if (!houses) return Promise.reject(new Error("no houses found"));
@@ -150,3 +145,49 @@ export const getHouseService = async (
 
   return getHouse;
 };
+
+
+// add review
+export const addReviewService = async (data:Prisma.reviewUncheckedCreateInput)=> {
+  const newReview = await client.review.create({data})
+  if (!newReview) return Promise.reject(new Error("review not added"));
+  return newReview;
+}
+
+// get reviews for a house
+export const getReviewsService = async (houseId: string) => {
+  const reviews = await client.review.findMany({
+    where: { houseId },
+  });
+  if (!reviews) return Promise.reject(new Error("no reviews found"));
+  return reviews;
+}
+
+// delete review
+export const deleteReviewService = async (reviewId: string) => {
+  const deletedReview = await client.review.update({
+    where: { id: reviewId },
+    data: { isDeleted: true },
+  });
+  if (!deletedReview) return Promise.reject(new Error("review not deleted"));
+  return deletedReview;
+}
+
+// update review
+export const updateReviewService = async (data: Prisma.reviewUncheckedUpdateInput) => {
+  const updatedReview = await client.review.update({
+    where: { id: data.id as string },
+    data: data,
+  });
+  if (!updatedReview) return Promise.reject(new Error("review not updated"));
+  return updatedReview;
+}
+
+// get all reviews for a user
+export const getUserReviewsService = async (userId: string) => {
+  const reviews = await client.review.findMany({
+    where: { userId },
+  });
+  if (!reviews) return Promise.reject(new Error("no reviews found for this user"));
+  return reviews;
+}
