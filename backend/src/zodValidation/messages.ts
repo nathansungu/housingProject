@@ -1,24 +1,23 @@
-import {z} from "zod"
-export const sendMessage = z.object({
+import {boolean, z} from "zod"
+export const sendMessageValidation = z.object({
     senderId: z.string(),
     receiverId: z.string(),
     message: z.string(),
     houseId: z.string().optional()
 })
 
-export const deleteMessage = z.object({
+export const messageIdValidation = z.object({
     messageId: z.string()
 })
 
-export const getMessagesByHouse = z.object({
+export const houseIdValidation = z.object({
     houseId: z.string()
 })
 
-export const getMessagesByUser = z.object({
-    userId: z.string()
+export const messageStatusValidation = z.object({
+    status: z.boolean()
 })
 
-export const markMessagesAsRead = z.object({
-    messageId: z.array(z.string())
-})
+
+
 
