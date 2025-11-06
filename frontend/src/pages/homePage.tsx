@@ -1,12 +1,9 @@
 //home page
-
+import {NavBar} from '../components/navBar';
 export const HomePage = () => {
     return (
         <>
-        <div style={{color:"green"}}>
-            Home Page
-        </div>
-        
+        <NavBar />        
         </>
     )
 }
