@@ -1,7 +1,14 @@
-import { Container, Typography, Button, Stack,  } from "@mui/material";
+import { Dropdown, Menu, MenuButton } from "@mui/joy";
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  Stack,
+  MenuItem,
+} from "@mui/material";
 import { ArrowDropDown } from "@mui/icons-material";
-import DropDownMenu from "material-ui/DropDownMenu"
-import MenuItems from "material-ui/MenuItem"
+
 export const NavBar = () => {
   return (
     <>
@@ -17,45 +24,48 @@ export const NavBar = () => {
         }}
       >
         <Container>
-          <Typography sx={{  }}>Easy Housing</Typography>
+          <Typography sx={{ color: "white" }}>Easy Housing</Typography>
         </Container>
         <Container
           sx={{
-            textAlign: "center",
+            display: "flex",
             flexDirection: "row",
+            gap: 2,
+            alignItems: "center",
           }}
         >
-          <Button>
-            <Typography sx={{}}>home</Typography>
+          <Button sx={{ color: "white" }}>home</Button>
+
+          <Button sx={{ color: "white" }}>houses</Button>
+          <Button sx={{ color: "white" }}>about us</Button>
+
+          <Button endIcon={<ArrowDropDown sx={{ color: "white" }} />}>
+            <Typography sx={{ color: "white" }}>profile</Typography>
           </Button>
 
-          <Button>
-            <Typography>houses</Typography>
-          </Button>
-          <Button>
-            <Typography>about us</Typography>
-          </Button>
+          <Dropdown>
+            <MenuButton variant="plain" sx={{ color: "inherit", gap: 1 }}>
+              <Box
+                width="2rem"
+                height="2rem"
+                component="img"
+                src="/to-do-list.png"
+              />
+              <Typography fontWeight={300}>TASKS</Typography>
+            </MenuButton>
 
-          <Button>
-            <Typography>profile</Typography>
-            <DropDownMenu>
-              <ArrowDropDown /> profile
-              <MenuItems>
-              <Button>
-                update Profile
-              </Button>
-              <Button>
-                change password
-              </Button>
-              <Button>
-                logout
-              </Button>
-              </MenuItems>
-            </DropDownMenu>
-            
-
-            
-          </Button>
+            <Menu>
+              <MenuItem>
+                <Button>Add Task</Button>
+              </MenuItem>
+              <MenuItem>
+                <Button>Trash</Button>
+              </MenuItem>
+              <MenuItem>
+                <Button>Completed</Button>
+              </MenuItem>
+            </Menu>
+          </Dropdown>
         </Container>
       </Stack>
     </>
