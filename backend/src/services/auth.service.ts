@@ -1,6 +1,6 @@
 import Prisma from "@prisma/client";
 import { hash, compare } from "bcrypt";
-import e from "express";
+import jwt from "jsonwebtoken";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 const client = new Prisma.PrismaClient();
 type RegisterUserInput = {
@@ -44,19 +44,22 @@ export const loginUserService = async (
   password: string
 ) => {
   const isValidUser = await client.auth.findFirst({
-    where: { OR: [{ email: identifier }, { userName: identifier }] },
+
+    where: { OR: [{ email: identifier }, { userName: identifier }]},include: { user: true }
   });
-  if (!isValidUser) return Promise.reject(new Error("no such user found"));
+  if (!isValidUser) return Promise.reject(new Error("invalid credentials"));
   const isPasswordValid = await compare(password, isValidUser.password);
   if (!isPasswordValid) return Promise.reject(new Error("invalid credentials"));
 
   //crete jwt token
-  if (!process.env.JWT_SECRET) {
+  if (!process.env.JWT_TOKEN_SECRET) {
     throw new Error("JWT_SECRET environment variable is not defined");
   }
-
+  
   const accessToken = sign(
-    { userId: isValidUser.id },
+    { userId: isValidUser.id,
+      firstName: isValidUser.user?.firstName,
+     },
     process.env.JWT_TOKEN_SECRET as string,
     { expiresIn: "15m" }
   );

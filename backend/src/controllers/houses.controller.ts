@@ -27,16 +27,19 @@ import { addReviewValidation, deleteReviewValidation, getReviewsValidation, upda
 
 export const addHouses = asyncHandler(async (req: Request, res: Response) => {
   const data = await addHouseValidation.parseAsync(req.body);
-  const landlordId = req.userId;
-  const house = await addHouseService({ ...data, landlordId });
+  const landlordId = req.user?.id!;
+  console.log("landlord id", landlordId); 
+  const house = await addHouseService({ ...data, 
+    landlordId });
   if (house)
-    res.status(200).json({ message: "house added successfully", house });
+    res.status(
+  200).json({ message: "house added successfully", house });
   return;
 });
 
 export const updateHouse = asyncHandler(async (req: Request, res: Response) => {
   const data = await updateHouseValidation.parseAsync(req.body);
-  const landlordId = req.userId;
+  const landlordId = req.user?.id;
   const houseId = req.params.housesInclude;
   const updatedHouse = await updateHouseService({
     ...data,
@@ -87,7 +90,7 @@ export const updateHousePictures = asyncHandler(
 //delete a house
 export const deleteHouse = asyncHandler(async (req: Request, res: Response) => {
   const houseId = req.params.houseId;
-  const landlordId = req.userId;
+  const landlordId = req.user?.id;
 
   const deletedHouse = await deleteHouseService(houseId);
   if (deletedHouse)
@@ -127,7 +130,7 @@ export const getHouse = asyncHandler(async(req:Request, res:Response)=>{
 //add review
 export const addReview = asyncHandler(async (req: Request, res: Response) => {
   const data = await addReviewValidation.parseAsync(req.body);
-  const userId = req.userId;
+  const userId = req.user?.id!;
   const newReview = await addReviewService({ ...data, userId });
   if (newReview)
     res.status(201).json({ message: "review added successfully", newReview });
@@ -155,7 +158,7 @@ export const deleteReview = asyncHandler(async (req: Request, res: Response) => 
 //update review
 export const updateReview = asyncHandler(async (req: Request, res: Response) => {
   const {houseId, rating, comment, reviewId} = await updateReviewValidation.parseAsync(req.body);
-  const userId = req.userId;
+  const userId = req.user?.id;
   const updatedReview = await updateReviewService({ houseId,rating,comment, userId, id: reviewId });
   if (updatedReview)
     res.status(200).json({ message: "review updated successfully", updatedReview });

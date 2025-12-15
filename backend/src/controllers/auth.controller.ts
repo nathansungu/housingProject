@@ -27,7 +27,15 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const loginData = await loginValidation.parseAsync(req.body);
   const login = await loginUserService(loginData.identifier, loginData.password);
   if (login) {
-    res.status(200).json({...login});
+    res
+    .cookie("accessToken", login.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 15 * 60 * 1000, 
+    })
+    .status(200)
+    .json({...login});
     return
   }   
 
@@ -42,7 +50,7 @@ export const refreshToken = asyncHandler(
       return;
     }
 
-    const newAccessToken = await refreshTokenService(refreshToken);
+    const newAccessToken =  refreshTokenService(refreshToken);
     if (newAccessToken) {
       res.status(200).json({ accessToken: newAccessToken });
       return;
@@ -58,12 +66,25 @@ export const refreshToken = asyncHandler(
   })
 
     
-export const changePassword = asyncHandler(async(req:Request, res:Response) =>{
-  const userId = req.userId
-  const { currentPassword, newPassword } = await changePasswordValidation.parseAsync(req.body)
-  const updatedAuth = await changePasswordService(userId, newPassword, currentPassword)
-  if(updatedAuth) return res.status(200).json({message: "password changed successfully"})
-})
+export const changePassword = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const userId = req.user.id
+
+    const { currentPassword, newPassword } =
+      await changePasswordValidation.parseAsync(req.body);
+
+    await changePasswordService(userId, newPassword, currentPassword);
+
+    return res.status(200).json({
+      message: "Password changed successfully",
+    });
+  }
+);
+
 
 
 export const forgotPassword = asyncHandler(async(req:Request, res:Response) =>{
