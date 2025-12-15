@@ -1,3 +1,4 @@
+import { logoutUserService } from './../services/auth.service';
 import {
   registerUserValidation,
   loginValidation,
@@ -8,6 +9,7 @@ import { asyncHandler } from "../utilities/asyncHandler";
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { changePasswordService, loginUserService, refreshTokenService, registerUserService } from "../services/auth.service";
+import { message } from "../routes/messags.route";
 const client = new PrismaClient();
 
 export const registerUser = asyncHandler(
@@ -27,15 +29,23 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const loginData = await loginValidation.parseAsync(req.body);
   const login = await loginUserService(loginData.identifier, loginData.password);
   if (login) {
+    // set cookie for access token and refresh token
     res
     .cookie("accessToken", login.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 15 * 60 * 1000, 
+    }   
+  )
+    .cookie("refreshToken", login.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 5 * 24 * 60 * 60 * 1000, 
     })
     .status(200)
-    .json({...login});
+    .json({message: "login successful" });
     return
   }   
 
@@ -44,7 +54,7 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 //refresh token
 export const refreshToken = asyncHandler(
   async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.cookies;
     if (!refreshToken) {
       res.status(400).json({ message: "refresh token is required" });
       return;
@@ -59,10 +69,18 @@ export const refreshToken = asyncHandler(
 
   })
 
-  //logout user
-
-  //to do
+  
   export const logoutUser = asyncHandler(async(req:Request, res:Response) =>{
+    const {accessToken, refreshToken} = req.cookies;
+    
+    if (!accessToken || !refreshToken) {
+      return res.status(400).json({message: "no tokens found"})
+    }
+    const logout= await logoutUserService(accessToken, refreshToken)
+    if (logout) {
+      res.status(200).json({message: "logout successful"})
+      return
+    }
   })
 
     

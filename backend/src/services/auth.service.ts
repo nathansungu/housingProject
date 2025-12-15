@@ -1,3 +1,4 @@
+import { refreshToken } from './../controllers/auth.controller';
 import Prisma from "@prisma/client";
 import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -51,7 +52,7 @@ export const loginUserService = async (
   const isPasswordValid = await compare(password, isValidUser.password);
   if (!isPasswordValid) return Promise.reject(new Error("invalid credentials"));
 
-  //crete jwt token
+  
   if (!process.env.JWT_TOKEN_SECRET) {
     throw new Error("JWT_SECRET environment variable is not defined");
   }
@@ -73,18 +74,34 @@ export const loginUserService = async (
 };
 
 export const refreshTokenService = (refreshToken: string) => {
-  const { userId } = verify(
+  const decodec = verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET as string
   ) as JwtPayload;
-  if (!userId) return;
+  const { userId } = decodec;
+  if (!userId) throw new Error("invalid refresh token");
   const accessToken = sign({ userId }, process.env.JWT_TOKEN_SECRET as string, {
     expiresIn: "15m",
   });
   return accessToken;
 };
 //TO DO
-export const logoutUserService = async (userId: string) => {};
+export const logoutUserService = async (accessToken: string, refreshToken:string) => {
+  const decodeAccessToken =verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET as string  
+  )
+  const decodeRefreshToken =verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET as string  
+  )
+  if (!decodeAccessToken || !decodeRefreshToken) {
+    return Promise.reject(new Error("invalid tokens"));
+  }
+
+  cookieStore.delete("accessToken");
+  cookieStore.delete("refreshToken");
+};
 
 
 export const changePasswordService = async (
