@@ -51,21 +51,23 @@ export const loginUserService = async (
   if (!isValidUser) return Promise.reject(new Error("invalid credentials"));
   const isPasswordValid = await compare(password, isValidUser.password);
   if (!isPasswordValid) return Promise.reject(new Error("invalid credentials"));
-
-  
+    
   if (!process.env.JWT_TOKEN_SECRET) {
     throw new Error("JWT_SECRET environment variable is not defined");
   }
   
   const accessToken = sign(
-    { userId: isValidUser.id,
+    { authId: isValidUser.id,
+      userId: isValidUser.user?.id,
       firstName: isValidUser.user?.firstName,
      },
     process.env.JWT_TOKEN_SECRET as string,
     { expiresIn: "15m" }
   );
   const refreshToken = sign(
-    { userId: isValidUser.id },
+    { authId: isValidUser.id,
+      userId: isValidUser.user?.id
+    },
     process.env.REFRESH_TOKEN_SECRET as string,
     { expiresIn: "5d" }
   );
@@ -74,18 +76,18 @@ export const loginUserService = async (
 };
 
 export const refreshTokenService = (refreshToken: string) => {
-  const decodec = verify(
+  const decoded = verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET as string
   ) as JwtPayload;
-  const { userId } = decodec;
-  if (!userId) throw new Error("invalid refresh token");
-  const accessToken = sign({ userId }, process.env.JWT_TOKEN_SECRET as string, {
+  const { userId, authId } = decoded;
+  if (!userId ) throw new Error("invalid refresh token");
+  const accessToken = sign({ userId, authId }, process.env.JWT_TOKEN_SECRET as string, {
     expiresIn: "15m",
   });
   return accessToken;
 };
-//TO DO
+
 export const logoutUserService = async (accessToken: string, refreshToken:string) => {
   const decodeAccessToken =verify(
     refreshToken,

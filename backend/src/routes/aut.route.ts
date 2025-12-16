@@ -5,7 +5,7 @@ const auth = Router();
 
 auth.post('/register', registerUser);
 auth.post('/login', loginUser);
-auth.post('/refresh-token', refreshToken);
+auth.post('/refresh', refreshToken);
 auth.post('/logout', verifyLogin, logoutUser);
 auth.post('/change-password',verifyLogin, changePassword);
 auth.post('/forgot-password',verifyLogin, forgotPassword);

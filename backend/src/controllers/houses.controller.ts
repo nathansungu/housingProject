@@ -23,23 +23,25 @@ import {
   updateHousePicturesValidation,
   updateHouseValidation,
 } from "../zodValidation/houses";
-import { addReviewValidation, deleteReviewValidation, getReviewsValidation, updateReviewValidation } from "../zodValidation/reviews";
+import {
+  addReviewValidation,
+  deleteReviewValidation,
+  getReviewsValidation,
+  updateReviewValidation,
+} from "../zodValidation/reviews";
 
 export const addHouses = asyncHandler(async (req: Request, res: Response) => {
   const data = await addHouseValidation.parseAsync(req.body);
-  const landlordId = req.user?.id!;
-  console.log("landlord id", landlordId); 
-  const house = await addHouseService({ ...data, 
-    landlordId });
+  const landlordId = req.user?.userId!;
+  const house = await addHouseService({ ...data, landlordId });
   if (house)
-    res.status(
-  200).json({ message: "house added successfully", house });
+    res.status(200).json({ message: "house added successfully", house });
   return;
 });
 
 export const updateHouse = asyncHandler(async (req: Request, res: Response) => {
   const data = await updateHouseValidation.parseAsync(req.body);
-  const landlordId = req.user?.id;
+  const landlordId = req.user?.userId;
   const houseId = req.params.housesInclude;
   const updatedHouse = await updateHouseService({
     ...data,
@@ -90,7 +92,7 @@ export const updateHousePictures = asyncHandler(
 //delete a house
 export const deleteHouse = asyncHandler(async (req: Request, res: Response) => {
   const houseId = req.params.houseId;
-  const landlordId = req.user?.id;
+  const landlordId = req.user?.userId;
 
   const deletedHouse = await deleteHouseService(houseId);
   if (deletedHouse)
@@ -98,8 +100,7 @@ export const deleteHouse = asyncHandler(async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "house deleted successfully", deletedHouse });
   return;
-}
-)
+});
 //delete img
 
 export const deleteHouseImg = asyncHandler(
@@ -118,55 +119,62 @@ export const deleteHouseImg = asyncHandler(
 
 //search houses
 
-export const getHouse = asyncHandler(async(req:Request, res:Response)=>{
-  const data = await getHousesValidation.parseAsync(req.params)
-  const houses = await getHouseService(data)
-  if(houses){
-    res.status(201).json(houses)
-    return
+export const getHouse = asyncHandler(async (req: Request, res: Response) => {
+  const data = await getHousesValidation.parseAsync(req.params);
+  const houses = await getHouseService(data);
+  if (houses) {
+    res.status(201).json(houses);
+    return;
   }
-})
+});
 
 //add review
 export const addReview = asyncHandler(async (req: Request, res: Response) => {
   const data = await addReviewValidation.parseAsync(req.body);
-  const userId = req.user?.id!;
+  const userId = req.user?.userId!;
   const newReview = await addReviewService({ ...data, userId });
   if (newReview)
     res.status(201).json({ message: "review added successfully", newReview });
   return;
-})
+});
 
-//get reviews // pass in user, review or houseid as id 
+//get reviews // pass in user, review or houseid as id
 export const getReviews = asyncHandler(async (req: Request, res: Response) => {
   const { id } = await getReviewsValidation.parseAsync(req.params);
   const reviews = await getReviewsService(id);
-  if (reviews)
-    res.status(200).json({ reviews });
-})
+  if (reviews) res.status(200).json({ reviews });
+});
 
 //delete review
-export const deleteReview = asyncHandler(async (req: Request, res: Response) => {
-  const { reviewId } = await deleteReviewValidation.parseAsync(req.body);
-  const deletedReview = await deleteReviewService(reviewId);
-  if (deletedReview)
-    res.status(200).json({ message: "review deleted successfully", deletedReview });
-  return;     
-})
-
+export const deleteReview = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { reviewId } = await deleteReviewValidation.parseAsync(req.body);
+    const deletedReview = await deleteReviewService(reviewId);
+    if (deletedReview)
+      res
+        .status(200)
+        .json({ message: "review deleted successfully", deletedReview });
+    return;
+  }
+);
 
 //update review
-export const updateReview = asyncHandler(async (req: Request, res: Response) => {
-  const {houseId, rating, comment, reviewId} = await updateReviewValidation.parseAsync(req.body);
-  const userId = req.user?.id;
-  const updatedReview = await updateReviewService({ houseId,rating,comment, userId, id: reviewId });
-  if (updatedReview)
-    res.status(200).json({ message: "review updated successfully", updatedReview });
-  return;
-})
-
-
-
-
-
-
+export const updateReview = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { houseId, rating, comment, reviewId } =
+      await updateReviewValidation.parseAsync(req.body);
+    const userId = req.user?.userId!;
+    const updatedReview = await updateReviewService({
+      houseId,
+      rating,
+      comment,
+      userId,
+      id: reviewId,
+    });
+    if (updatedReview)
+      res
+        .status(200)
+        .json({ message: "review updated successfully", updatedReview });
+    return;
+  }
+);

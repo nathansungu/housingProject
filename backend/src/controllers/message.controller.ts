@@ -25,7 +25,7 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUserMessages = asyncHandler(
   async (req: Request, res: Response) => {
-    const userId = req.user?.id!;
+    const userId = req.user?.userId!;
     const messages = await userMessagesServices(userId);
     if (messages) {
       res.status(200).json(messages);
@@ -48,7 +48,7 @@ export const deleteMessage = asyncHandler(
 export const getHouseMessages = asyncHandler(
   async (req: Request, res: Response) => {
     const { houseId } = await houseIdValidation.parseAsync(req.params);
-    const messages = await getHouseMessagesService(houseId, req.user?.id!);
+    const messages = await getHouseMessagesService(houseId, req.user?.userId!);
     if (messages) {
       res.status(200).json(messages);
       return;

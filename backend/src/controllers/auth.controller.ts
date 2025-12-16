@@ -62,7 +62,15 @@ export const refreshToken = asyncHandler(
 
     const newAccessToken =  refreshTokenService(refreshToken);
     if (newAccessToken) {
-      res.status(200).json({ accessToken: newAccessToken });
+      res
+      .cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 15 * 60 * 1000, 
+      })
+      .status(200)
+      .json({ accessToken: newAccessToken });
       return;
     }
     res.status(400).json({ message: "invalid refresh token" });
@@ -90,7 +98,7 @@ export const changePassword = asyncHandler(
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const userId = req.user.id
+    const userId = req.user.authid;
 
     const { currentPassword, newPassword } =
       await changePasswordValidation.parseAsync(req.body);
