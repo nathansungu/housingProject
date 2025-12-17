@@ -1,7 +1,5 @@
-import { refreshToken } from './../controllers/auth.controller';
 import Prisma from "@prisma/client";
 import { hash, compare } from "bcrypt";
-import jwt from "jsonwebtoken";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 const client = new Prisma.PrismaClient();
 type RegisterUserInput = {
@@ -52,10 +50,6 @@ export const loginUserService = async (
   const isPasswordValid = await compare(password, isValidUser.password);
   if (!isPasswordValid) return Promise.reject(new Error("invalid credentials"));
     
-  if (!process.env.JWT_TOKEN_SECRET) {
-    throw new Error("JWT_SECRET environment variable is not defined");
-  }
-  
   const accessToken = sign(
     { authId: isValidUser.id,
       userId: isValidUser.user?.id,
@@ -88,10 +82,24 @@ export const refreshTokenService = (refreshToken: string) => {
   return accessToken;
 };
 
+export const getUserService = async (authId: string) => {
+  const user = await client.user.findUnique({
+    where: { id: authId },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      imgUrl: true,
+    },
+  });
+  if (!user) return Promise.reject(new Error("user not found"));
+  return user;
+};
+
 export const logoutUserService = async (accessToken: string, refreshToken:string) => {
   const decodeAccessToken =verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET as string  
+    accessToken,
+    process.env.JWT_TOKEN_SECRET as string  
   )
   const decodeRefreshToken =verify(
     refreshToken,
@@ -101,8 +109,7 @@ export const logoutUserService = async (accessToken: string, refreshToken:string
     return Promise.reject(new Error("invalid tokens"));
   }
 
-  cookieStore.delete("accessToken");
-  cookieStore.delete("refreshToken");
+  return true;
 };
 
 
@@ -114,7 +121,7 @@ export const changePasswordService = async (
   const user = await client.auth.findUnique({
     where: { id: userId },
   });
-  if (!user) return Promise.reject(new Error("no such user found"));
+  if (!user) return Promise.reject(new Error("invalid credentials"));
   const isValid = await compare(currentPassword, user!.password);
   if (!isValid) return Promise.reject(new Error("invalid credentials"));
   const passwordHash = await hash(newPassword, 10);
@@ -133,6 +140,7 @@ export const forgotPasswordService = async (identifier: string) => {
   if (!user) return Promise.reject(new Error("no such user found"));
 
   //send email to user with reset link
+  
 
 }
 

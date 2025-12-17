@@ -1,10 +1,9 @@
-import { error } from 'console';
 import {NextFunction, Request, Response } from "express";
 import {JsonWebTokenError, TokenExpiredError} from "jsonwebtoken";
 import z, {ZodError} from "zod";
 
 export const errorHandler = (error:Error, _req:Request, res:Response, next:NextFunction) => {
-  console.error(error);
+  
   if (error instanceof ZodError) {
     const prettyError = z.prettifyError(error);
     res.status(400).json({ message: prettyError });
@@ -19,6 +18,7 @@ export const errorHandler = (error:Error, _req:Request, res:Response, next:NextF
     res.status(401).json({ message: "expried token refresh or login again" });
     return;
   }
+ 
   if (error.message === "invalid tokens" || error.message === "invalid refresh token") {
     res.status(401).json({ message: "Invalid tokens. Please login to continue." });
     return;

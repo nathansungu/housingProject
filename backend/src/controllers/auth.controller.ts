@@ -1,4 +1,4 @@
-import { logoutUserService } from './../services/auth.service';
+import { getUserService, logoutUserService } from './../services/auth.service';
 import {
   registerUserValidation,
   loginValidation,
@@ -9,7 +9,7 @@ import { asyncHandler } from "../utilities/asyncHandler";
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { changePasswordService, loginUserService, refreshTokenService, registerUserService } from "../services/auth.service";
-import { message } from "../routes/messags.route";
+
 const client = new PrismaClient();
 
 export const registerUser = asyncHandler(
@@ -28,6 +28,10 @@ export const registerUser = asyncHandler(
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const loginData = await loginValidation.parseAsync(req.body);
   const login = await loginUserService(loginData.identifier, loginData.password);
+  if (!login) {
+    res.status(400).json({ message: "invalid credentials" });
+    return;
+  }
   if (login) {
     // set cookie for access token and refresh token
     res
@@ -77,6 +81,14 @@ export const refreshToken = asyncHandler(
 
   })
 
+  export const logedInUser = asyncHandler(async(req:Request, res:Response) =>{
+    const userId = req.user?.authId;
+    if (!userId) {
+      return res.status(401).json({message: "unauthorized"})
+    }
+    const user = await getUserService(userId)
+    res.status(200).json({data: user})
+  })
   
   export const logoutUser = asyncHandler(async(req:Request, res:Response) =>{
     const {accessToken, refreshToken} = req.cookies;
@@ -86,7 +98,10 @@ export const refreshToken = asyncHandler(
     }
     const logout= await logoutUserService(accessToken, refreshToken)
     if (logout) {
-      res.status(200).json({message: "logout successful"})
+      res
+      .clearCookie("accessToken")
+      .clearCookie("refreshToken")
+      .status(200).json({message: "logout successful"})
       return
     }
   })
@@ -98,13 +113,15 @@ export const changePassword = asyncHandler(
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const userId = req.user.authid;
+    const userId = req.user.authId;
 
     const { currentPassword, newPassword } =
       await changePasswordValidation.parseAsync(req.body);
 
-    await changePasswordService(userId, newPassword, currentPassword);
-
+    const changePassword = await changePasswordService(userId, newPassword, currentPassword);
+    if (!changePassword) {
+      return res.status(400).json({ message: "failed to change password" });
+    }
     return res.status(200).json({
       message: "Password changed successfully",
     });

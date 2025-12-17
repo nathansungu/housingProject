@@ -31,10 +31,7 @@ export const updateHouseService = async (
     return Promise.reject(
       new Error("you are not authorized to update this house")
     );
-  if (houseOwnerId?.landlordId !== data.landlordId)
-    return Promise.reject(
-      new Error("you are not authorized to update this house")
-    );
+  
   const updatedHouse = await client.houses.update({
     where: {
       id: data.id as string,
