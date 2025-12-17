@@ -14,13 +14,13 @@ export const HousesComponents = () => {
     setHouses(houses);
     setMessage(message);
   };
-  useQuery({
+   useQuery({
     queryKey: ["houses"],
     queryFn: fetchHouses,
   });
 
 
-
+  console.log(houses)
   return <> 
 
   <Container sx={{height:20, color: green}}>

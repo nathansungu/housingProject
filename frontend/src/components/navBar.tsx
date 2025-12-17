@@ -24,7 +24,14 @@ export const NavBar = () => {
         }}
       >
         <Container>
-          <Typography sx={{ color: "white" }}>Easy Housing</Typography>
+          <Box>
+            <img
+              src="/logo.png"
+              alt="Logo"
+              style={{ width: "80px", height: "60px", borderRadius: "50%" }}
+
+            />
+          </Box>
         </Container>
         <Container
           sx={{
@@ -39,19 +46,11 @@ export const NavBar = () => {
           <Button sx={{ color: "white" }}>houses</Button>
           <Button sx={{ color: "white" }}>about us</Button>
 
-          <Button endIcon={<ArrowDropDown sx={{ color: "white" }} />}>
-            <Typography sx={{ color: "white" }}>profile</Typography>
-          </Button>
+          
 
           <Dropdown>
-            <MenuButton variant="plain" sx={{ color: "inherit", gap: 1 }}>
-              <Box
-                width="2rem"
-                height="2rem"
-                component="img"
-                src="/to-do-list.png"
-              />
-              <Typography fontWeight={300}>TASKS</Typography>
+            <MenuButton endDecorator={<ArrowDropDown sx={{ color: "white" }} />}>
+              <Typography fontWeight={300} color="white">Profile</Typography>
             </MenuButton>
 
             <Menu>
