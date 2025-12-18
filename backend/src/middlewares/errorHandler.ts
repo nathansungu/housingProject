@@ -1,9 +1,26 @@
-import {NextFunction, Request, Response } from "express";
-import {JsonWebTokenError, TokenExpiredError} from "jsonwebtoken";
-import z, {ZodError} from "zod";
+import { NextFunction, Request, Response } from "express";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
+import { Prisma } from "@prisma/client";
+import z, { ZodError } from "zod";
 
-export const errorHandler = (error:Error, _req:Request, res:Response, next:NextFunction) => {
-  
+export const errorHandler = (
+  error: Error,
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log(error);
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === "P2002") {
+      res.status(409).json({ message: "Duplicate entry detected." });
+      return;
+    }
+    if (error.code === "P2025") {
+      res.status(404).json({ message: "Resource not found." });
+      return;
+    }
+    
+  }
   if (error instanceof ZodError) {
     const prettyError = z.prettifyError(error);
     res.status(400).json({ message: prettyError });
@@ -18,9 +35,14 @@ export const errorHandler = (error:Error, _req:Request, res:Response, next:NextF
     res.status(401).json({ message: "expried token refresh or login again" });
     return;
   }
- 
-  if (error.message === "invalid tokens" || error.message === "invalid refresh token") {
-    res.status(401).json({ message: "Invalid tokens. Please login to continue." });
+
+  if (
+    error.message === "invalid tokens" ||
+    error.message === "invalid refresh token"
+  ) {
+    res
+      .status(401)
+      .json({ message: "Invalid tokens. Please login to continue." });
     return;
   }
 
@@ -30,7 +52,9 @@ export const errorHandler = (error:Error, _req:Request, res:Response, next:NextF
   }
 
   if (error.message === "user not created") {
-    res.status(400).json({ message: "Failed to create account. Please try again later." });
+    res
+      .status(400)
+      .json({ message: "Failed to create account. Please try again later." });
     return;
   }
 
@@ -40,22 +64,25 @@ export const errorHandler = (error:Error, _req:Request, res:Response, next:NextF
     return;
   }
 
-    if (error.message === "invalid house") {
+  if (error.message === "invalid house") {
     res.status(400).json({ message: "Invalid house data provided." });
     return;
   }
 
-  if (error.message ==="picture not added"||
-      error.message ==="house not updated"||
-      error.message ==="house not created"||
-      error.message ==="house not deleted"
+  if (
+    error.message === "picture not added" ||
+    error.message === "house not updated" ||
+    error.message === "house not created" ||
+    error.message === "house not deleted"
   ) {
     res.status(400).json({ message: error.message });
     return;
   }
 
   if (error.message === "you are not authorized to update this house") {
-    res.status(403).json({ message: "You are not authorized to update this house." });
+    res
+      .status(403)
+      .json({ message: "You are not authorized to update this house." });
     return;
   }
 
@@ -63,5 +90,5 @@ export const errorHandler = (error:Error, _req:Request, res:Response, next:NextF
     res.status(400).json({ message: "Failed to update user profile." });
     return;
   }
-  res.status(500).json({ message: 'Internal Server Error' });
-}
+  res.status(500).json({ message: "Internal Server Error" });
+};
