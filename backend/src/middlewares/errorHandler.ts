@@ -12,7 +12,7 @@ export const errorHandler = (
   console.log(error);
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === "P2002") {
-      res.status(409).json({ message: "Duplicate entry detected." });
+      res.status(409).json({ message: "Something went wrong with the email." });
       return;
     }
     if (error.code === "P2025") {
