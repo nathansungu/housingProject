@@ -51,17 +51,31 @@ const Register = () => {
     }
   }, [isSuccess]);
   return (
-    <>
-    <Container >
+    <
+    >       
+    <Container 
+      sx={{
+        backgroundImage:"url(/logo.png)",
+        backgroundRepeat: "no-repeat",
+        backgroundSize:"cover",
+        backgroundPosition: "center",
+        backgroundBlendMode: "darken",
+        height: "100vh",
+        margin: "auto",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+      >
       <Box
         display="flex"
         flexDirection="column"
         gap={2}
-        width="300px"
+        width={{ xs: "90%", sm: "70%", md: "50%", lg: "30%" }}
         margin="auto"
-        marginTop="50px"
+        marginTop="5px"
+        padding={.5}
       >
-        <Typography variant="h4" color={"grey"}>
+        <Typography variant="h3" color={"blue"} >
           Register
         </Typography>
         <Snackbar
