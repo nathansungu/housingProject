@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Box, Button, IconButton, Input, Snackbar, Typography, Alert, Container } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import axios from "axios";
 import { useEffect } from "react";
 const Register = () => {
   const navigate = useNavigate();
@@ -27,7 +26,7 @@ const Register = () => {
       password: string;
       confirmPassword: string;
     }) => {
-      const response = await axios.post("http://localhost:4000/api/auth/register", data);
+      const response = await axiosInstance.post("http://localhost:4000/api/auth/register", data);
       return response.data;
     },
     onSuccess: () => {
@@ -169,6 +168,8 @@ const Register = () => {
               >
             {isPending ? "Registering..." : "Register"}
           </Button>
+
+          <Button onClick={() => navigate("/login")}>I have an account</Button>
         </Box>
       </Box>
       </Container>
