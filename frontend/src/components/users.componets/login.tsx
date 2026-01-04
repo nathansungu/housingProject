@@ -17,7 +17,14 @@ const Login  = ()=>{
             return response.data;
         },
         onSuccess: (data) => {
-            navigate("/dashboard");
+             const redirectPath = localStorage.getItem('redirectAfterLogin')
+                    if(redirectPath){
+                        localStorage.removeItem('redirectAfterLogin')
+                        navigate(redirectPath, { replace: true })
+                    } else {
+                        
+                        navigate('/dashboard', { replace: true })
+                    }
             console.log("Login successful", data);
         },
         onError: (error: any) => {

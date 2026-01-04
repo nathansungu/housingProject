@@ -4,8 +4,11 @@ import { LandingPage} from '../pages/landingPage';
 import { RegisterPage } from '../pages/registerPage';
 import{ HandleLogin }from '../pages/loginPage';
 import Protected from '../middleware/protectedRoutes';
+import refreshToken from '../middleware/refreshToken';
 const pagesRoutes = () =>{
+
     return (
+        refreshToken(),
         <>
         <Routes>
             //invalid route 
