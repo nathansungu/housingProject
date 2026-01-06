@@ -2,11 +2,12 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 interface User {
   firstName: string;
-  secondName: string;
+  lastName: string;
   email: string;
   userName: string;
   id: string;
   imgUrl:string;
+  role:string
 }
 
 interface UserStore {

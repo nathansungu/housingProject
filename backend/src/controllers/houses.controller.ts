@@ -58,7 +58,7 @@ export const updateHouse = asyncHandler(async (req: Request, res: Response) => {
 export const getAllHouses = asyncHandler(
   async (req: Request, res: Response) => {
     const getAllHouses = await getAllHousesService();
-    if (getAllHouses) res.status(200).json({ houses: getAllHouses });
+    if (getAllHouses) res.status(200).json({ ...getAllHouses });
     return;
   }
 );

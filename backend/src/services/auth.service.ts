@@ -82,9 +82,9 @@ export const refreshTokenService = (refreshToken: string) => {
   return accessToken;
 };
 
-export const getUserService = async (authId: string) => {
+export const getUserService = async (userId: string) => {
   const user = await client.user.findUnique({
-    where: { id: authId },
+    where: { id: userId },
     select: {
       id: true,
       firstName: true,

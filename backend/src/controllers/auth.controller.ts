@@ -82,13 +82,15 @@ export const refreshToken = asyncHandler(
   })
 
   export const logedInUser = asyncHandler(async(req:Request, res:Response) =>{
-    const userId = req.user?.authId;
+    const userId = req.user?.userId;
     if (!userId) {
       return res.status(401).json({message: "unauthorized"})
     }
     const user = await getUserService(userId)
-    res.status(200).json({data: user})
+    res.status(200).json({user})
   })
+
+  
   
   export const logoutUser = asyncHandler(async(req:Request, res:Response) =>{
     const {accessToken, refreshToken} = req.cookies;

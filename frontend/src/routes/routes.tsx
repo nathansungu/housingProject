@@ -5,6 +5,7 @@ import { RegisterPage } from '../pages/registerPage';
 import{ HandleLogin }from '../pages/loginPage';
 import Protected from '../middleware/protectedRoutes';
 import refreshToken from '../middleware/refreshToken';
+import HandleDashboardPage from '../pages/dashboardPage';
 const pagesRoutes = () =>{
 
     return (
@@ -21,6 +22,11 @@ const pagesRoutes = () =>{
             <Route path="/home" element={
                 <Protected>
                 <HomePage/>
+                </Protected>
+            } />
+            <Route path="/dashboard" element={
+                <Protected>
+                <HandleDashboardPage/>
                 </Protected>
             } />
 
