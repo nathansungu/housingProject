@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Typography } from "@mui/joy";
+import fechUser from "../../utility/fetchUser";
 
 const Login = () => {
   const [identifier, setIdentifier] = useState("");
@@ -17,6 +18,7 @@ const Login = () => {
       return response.data;
     },
     onSuccess: (data) => {
+      fechUser();
       const redirectPath = localStorage.getItem("redirectAfterLogin");
       if (redirectPath) {
         localStorage.removeItem("redirectAfterLogin");

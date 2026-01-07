@@ -1,92 +1,129 @@
 import axiosInstance from "../../api/axios";
 import { useEffect, useState } from "react";
 import useUserStore from "../../store/user";
-import { Typography } from "@mui/joy";
-import {Container,Box } from "@mui/material";
+import { CardContent, Typography } from "@mui/joy";
+import { Container, Box, Grid, Card, CardHeader } from "@mui/material";
 import { House } from "@mui/icons-material";
 
 // declare houses type
 type House = {
-  id: string;
-  title: string;
   description: string;
+  electricBill: boolean;
+  id: string;
+  landlordId: string;
   location: string;
-  price: number;
+  name: string;
+  pricing: number;
+  rentDeadline: string;
+  roomType: string;
+  roomsNumber: number;
+  status: string;
+  vacantUnits: number;
+  waterBill: boolean;
+  wifi: boolean;
 };
 
 const Dashboard = () => {
-  // get user details from useUserStore
   const user = useUserStore().user;
-  
+
   const [houses, setHouses] = useState<House[]>([]);
   const [fetchError, setFetchError] = useState("");
-  const fetchAllHouses = async () => {
-    const allHouses = await axiosInstance.get("/houses");
-    console.log(allHouses)
-    if (allHouses.data) {
-      setHouses(allHouses.data);
-      console.log(houses)
-    } else {
+  const fetchHouses = async (url: string) => {
+    try {
+      const res = await axiosInstance.get(url);
+
+      // convert object → array
+      const housesArray = Array.isArray(res.data)
+        ? res.data
+        : Object.values(res.data);
+
+      setHouses(housesArray as House[]);
+    } catch (error) {
       setFetchError("Failed to fetch houses");
     }
-
-    return allHouses.data;
-  };
-
-  const fetchLandloardHouses = async (id: string) => {
-    const allHouses = await axiosInstance.get(`/houses/${id}`);
-    console.log(allHouses.data)
-    if (allHouses.data) {
-
-      setHouses(allHouses.data);
-      console.log(houses)
-    } else {
-      setFetchError("Failed to fetch houses");
-    }
-
-    return allHouses.data;
   };
 
   useEffect(() => {
     if (user?.role !== "landlord") {
-      fetchAllHouses();
+      fetchHouses("/houses");
     } else if (user?.role === "landlord") {
-      fetchLandloardHouses(user.id);
+      fetchHouses(`/houses/${user.id}`);
     }
   }, [user]);
-
-  // console.log("houses state", houses);
+  console.log("Houses:", houses);
 
   return (
     <>
       <Container>
-        <Typography level="h2">
-          Welcome, {user?.firstName} {user?.lastName}
-        </Typography>
-
-        
-
-        {/* <Box>
+        <Box mt={2}>
           {fetchError && <Typography color="danger">{fetchError}</Typography>}
-          <Typography level="h3">Available Houses:</Typography>
-          
-          {houses.length === 0 ? (
-            <Typography>No houses available.</Typography>
-          ) : (
-            //  houses.map((house: House) => (
-            //    <Box
-            //      key={house.id}
-            //      sx={{ border: "1px solid #ccc", padding: 2, marginBottom: 2 }}
-            //    >
-            //      <Typography level="h4">{house.title}</Typography>
-            //      <Typography>{house.description}</Typography>
-            //      <Typography>Location: {house.location}</Typography>
-            //      <Typography>Price: ${house.price}</Typography>
-            //    </Box>
-          //  )
-          //)
-          )}
-        </Box>  */}
+          <Grid container spacing={2} columns={12}>
+            {houses.length === 0 ? (
+              <Typography>No houses available.</Typography>
+            ) : (
+              houses.map((house: House) => (
+                <Grid size={{ md: 4, xs: 12, sm: 6 }} key={house.id}>
+                  <Card
+                    key={house.id}
+                    sx={{
+                      border: "1px solid #ccc",
+                      padding: 2,
+                      marginBottom: 2,
+                    }}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <CardHeader
+                        title={
+                          <Typography sx={{ variant: "h6", fontWeight: 600 }}>
+                            {house.name}
+                          </Typography>
+                        }
+                        sx={{ px: 0, pb: 1 }}
+                      />
+
+                      {/* Description */}
+                      <Typography
+                        sx={{ variant: "body2", color:"text.secondary" }}
+                       
+                        mb={2}
+                      >
+                        {house.description}
+                      </Typography>
+
+                      {/* Details Grid */}
+                      <Box
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                          rowGap: 1,
+                          columnGap: 2,
+                          mb: 2,
+                        }}
+                      >
+                        <Typography sx={{ variant: "body2" }}>
+                          <strong>Room Type:</strong> {house.roomType}
+                        </Typography>
+
+                        <Typography sx={{ variant: "body2" }}>
+                          <strong>Vacant Units:</strong> {house.vacantUnits}
+                        </Typography>
+
+                        <Typography sx={{ variant: "body2" }}>
+                          <strong>Location:</strong> {house.location}
+                        </Typography>
+                      </Box>
+
+                      {/* Price */}
+                      <Typography sx={{ variant: "h6", color: "primary", fontWeight: 700 }}>
+                        Price: ${house.pricing}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            )}
+          </Grid>
+        </Box>
       </Container>
     </>
   );
