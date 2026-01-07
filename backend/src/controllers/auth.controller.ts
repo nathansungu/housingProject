@@ -74,7 +74,6 @@ export const refreshToken = asyncHandler(
         maxAge: 15 * 60 * 1000, 
       })
       .status(200)
-      .json({ accessToken: newAccessToken });
       return;
     }
     res.status(400).json({ message: "invalid refresh token" });
