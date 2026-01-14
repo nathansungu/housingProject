@@ -1,11 +1,10 @@
-// import { cookieParser } from 'cookie-parser';
 import express from "express";
 import router from "./routes/index.routes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { errorHandler } from "./middlewares/errorHandler";
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL,
   credentials: true,
 };
 

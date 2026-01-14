@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
+    "prisma:generate": "prisma generate",
     "prod": "node build/app.js",
     "dev": "nodemon src/app.ts"
   },

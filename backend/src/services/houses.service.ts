@@ -10,7 +10,7 @@ export const getAllHousesService = async () => {
 };
 
 export const addHouseService = async (
-  data: Prisma.housesUncheckedCreateInput
+  data: Prisma.housesCreateInput
 ) => {
   const newHouse = await client.houses.create({
     data: data,
@@ -20,14 +20,14 @@ export const addHouseService = async (
 };
 
 export const updateHouseService = async (
-  data: Prisma.housesUncheckedUpdateInput
+  data: Prisma.housesUpdateInput
 ) => {
   const houseOwnerId = await client.houses.findUnique({
     where: { id: data.id as string },
     select: { landlordId: true },
   });
   // restrict update to house owner only
-  if (houseOwnerId != data.landlordId)
+  if (houseOwnerId != data.landlord)
     return Promise.reject(
       new Error("you are not authorized to update this house")
     );
@@ -44,7 +44,7 @@ export const updateHouseService = async (
 
 // add pictures to a house
 export const addHousePicturesService = async (
-  data: Prisma.housePicturesUncheckedCreateInput
+  data: Prisma.housePicturesCreateInput
 ) => {
   const newPictures = await client.housePictures.create({
     data: data,
@@ -145,7 +145,7 @@ export const getHouseService = async (
 
 
 // add review
-export const addReviewService = async (data:Prisma.reviewUncheckedCreateInput)=> {
+export const addReviewService = async (data:Prisma.reviewCreateInput)=> {
   const newReview = await client.review.create({data})
   if (!newReview) return Promise.reject(new Error("review not added"));
   return newReview;

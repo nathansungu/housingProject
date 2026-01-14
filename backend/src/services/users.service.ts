@@ -1,10 +1,11 @@
 import { PrismaClient} from "@prisma/client"
 import { Prisma } from "@prisma/client"
 const client = new PrismaClient()
-export const updateProfileService = async(data:Prisma.userUncheckedUpdateInput)=>{
-    const {userId, id, ...others} = data
+export const updateProfileService = async(data:Prisma.userUpdateInput)=>{
+    
+    const { id, ...others} = data
     const profile = await client.user.update({
-        where:{userId:userId as string},
+        where:{id:id as string},
         data:{...others}
     })
     if(!profile){
@@ -13,10 +14,10 @@ export const updateProfileService = async(data:Prisma.userUncheckedUpdateInput)=
     return profile
 }
 
-export const updateContactsService =async(data:Prisma.contactsUncheckedUpdateInput)=>{
-    const {userId, id, ...contacts}=data
+export const updateContactsService =async(data:Prisma.contactsUpdateInput)=>{
+    const { id, ...contacts}=data
     const contact = await client.contacts.update({
-        where:{userId:userId as string},
+        where:{userId:id as string},
         data:{...contacts}
     })
     if(!contact) return Promise.reject(new Error("failed to update user"))
