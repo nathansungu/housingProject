@@ -1,19 +1,17 @@
-//set up redis client
-import Redis from "ioredis";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import RedisStore from "rate-limit-redis";
+import Redis from "ioredis";
 
-const redis = new Redis({
-  host: "localhost",
-  port: 6379,
-});
+ const redis = new Redis({
+  host: process.env.REDIS_HOST || "127.0.0.1",
+  port: Number(process.env.REDIS_PORT) || 6379,
+  password: process.env.REDIS_PASSWORD || undefined,
+})
 
 export const createRateLimiter = (windowMs: number, max: number) => {
   return rateLimit({
     store: new RedisStore({
-      sendCommand: (command: string, ...args: string[]) => {
-        return (redis.call as any)(command, ...args);
-      },
+      sendCommand: (...args: string[]) => (redis.call as any)(...args),
     }),
 
     windowMs,
@@ -24,8 +22,8 @@ export const createRateLimiter = (windowMs: number, max: number) => {
     skipFailedRequests: true,
 
     keyGenerator: (req) => {
-      const base = req.user?.userId || req.ip;
-      return `${req.path}:${base}`;
+      if (req.user?.userId) return `user:${req.user.userId}`;
+      return `ip:${ipKeyGenerator(req as any)}`;
     },
 
     handler: (_req, res) => {
