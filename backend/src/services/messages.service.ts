@@ -1,11 +1,16 @@
 import { Prisma } from "@prisma/client";
-import { PrismaClient } from "@prisma/client";
-const client = new PrismaClient();
+import prisma from "../prismaClient";
 
-export const sendMessageService = async (
-  data: Prisma.messagesCreateInput
-) => {
-  const message = await client.messages.create({
+// send message data type
+type SendMessageInput = {
+   message: string;
+  senderId: string;
+  receiverId: string;
+  houseId?: string ;
+};
+
+export const sendMessageService = async (data: SendMessageInput) => {
+  const message = await prisma.messages.create({
     data: data,
   });
   if (!message) return Promise.reject(new Error("failed to send message"));
@@ -15,39 +20,45 @@ export const sendMessageService = async (
 //get user messages
 
 export const userMessagesServices = async (userId: string) => {
-  const message = await client.messages.findMany({
+  const message = await prisma.messages.findMany({
     where: {
       OR: [{ senderId: userId }],
     },
   });
   if (!message) return Promise.reject(new Error("failed to fetch message"));
-  return message
+  return message;
 };
 
 export const deleteMessageService = async (messageId: string) => {
-  const message = await client.messages.update({
+  const message = await prisma.messages.update({
     where: { id: messageId },
     data: { isDeleted: true },
   });
   if (!message) return Promise.reject(new Error("failed to delete message"));
-  return message
+  return message;
 };
 
-export const getHouseMessagesService = async (houseId: string, userId: string) => {
-  const messages = await client.messages.findMany({
+export const getHouseMessagesService = async (
+  houseId: string,
+  userId: string
+) => {
+  const messages = await prisma.messages.findMany({
     where: {
       AND: [{ senderId: userId, houseId: houseId }],
     },
   });
   if (!messages) return Promise.reject(new Error("failed to fetch message"));
-  return messages
+  return messages;
 };
 
-export const markMessageService = async (messageId:string, status:boolean)=>{
-    const message = await client.messages.update({
-    where:{id:messageId},
-    data:{isRead:status}
-    })
-    if (!message) return Promise.reject(new Error("failed to mark to as read"))
-    return message
-}
+export const markMessageService = async (
+  messageId: string,
+  status: boolean
+) => {
+  const message = await prisma.messages.update({
+    where: { id: messageId },
+    data: { isRead: status },
+  });
+  if (!message) return Promise.reject(new Error("failed to mark to as read"));
+  return message;
+};

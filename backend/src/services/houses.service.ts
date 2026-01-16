@@ -1,38 +1,38 @@
-import { PrismaClient } from "@prisma/client";
-import { Prisma } from "@prisma/client";
-const client = new PrismaClient();
-
+import prisma from "../prismaClient";
+import {
+  addReviewType,
+  CreateHouse,
+  CreateHousePictures,
+  UpdateHouse,
+  UpdateReviewType,
+} from "../../@types/houses";
 
 export const getAllHousesService = async () => {
-  const houses = await client.houses.findMany();
+  const houses = await prisma.houses.findMany();
   if (!houses) return Promise.reject(new Error("no houses found"));
   return houses;
 };
 
-export const addHouseService = async (
-  data: Prisma.housesCreateInput
-) => {
-  const newHouse = await client.houses.create({
+export const addHouseService = async (data: CreateHouse) => {
+  const newHouse = await prisma.houses.create({
     data: data,
   });
   if (!newHouse) return Promise.reject(new Error("house not created"));
   return newHouse;
 };
 
-export const updateHouseService = async (
-  data: Prisma.housesUpdateInput
-) => {
-  const houseOwnerId = await client.houses.findUnique({
+export const updateHouseService = async (data: UpdateHouse) => {
+  const houseOwnerId = await prisma.houses.findUnique({
     where: { id: data.id as string },
     select: { landlordId: true },
   });
   // restrict update to house owner only
-  if (houseOwnerId != data.landlord)
+  if (houseOwnerId?.landlordId != data.landlordId)
     return Promise.reject(
       new Error("you are not authorized to update this house")
     );
-  
-  const updatedHouse = await client.houses.update({
+
+  const updatedHouse = await prisma.houses.update({
     where: {
       id: data.id as string,
     },
@@ -43,10 +43,8 @@ export const updateHouseService = async (
 };
 
 // add pictures to a house
-export const addHousePicturesService = async (
-  data: Prisma.housePicturesCreateInput
-) => {
-  const newPictures = await client.housePictures.create({
+export const addHousePicturesService = async (data: CreateHousePictures) => {
+  const newPictures = await prisma.housePictures.create({
     data: data,
   });
   if (!newPictures) return Promise.reject(new Error("pictures not added"));
@@ -59,7 +57,7 @@ export const updateHousePicturesService = async (data: {
   newImgUrl: string;
 }) => {
   // Fetch existing house
-  const house = await client.housePictures.findUnique({
+  const house = await prisma.housePictures.findUnique({
     where: { houseId: data.houseId },
     select: { imgUrl: true },
   });
@@ -74,7 +72,7 @@ export const updateHousePicturesService = async (data: {
   );
 
   //update in DB
-  const updatedHouse = await client.housePictures.update({
+  const updatedHouse = await prisma.housePictures.update({
     where: { houseId: data.houseId },
     data: { imgUrl: updatedImgUrls },
   });
@@ -84,9 +82,9 @@ export const updateHousePicturesService = async (data: {
 
 export const deleteHouseImgService = async (
   houseId: string,
-  imgUrl: string
+  imgUrl: string,
 ) => {
-  const house = await client.housePictures.findUnique({
+  const house = await prisma.housePictures.findUnique({
     where: { houseId },
     select: { imgUrl: true },
   });
@@ -96,7 +94,7 @@ export const deleteHouseImgService = async (
   }
   const updatedArray = house.imgUrl.filter((url: string) => url !== imgUrl);
 
-  const updatedHouse = await client.housePictures.update({
+  const updatedHouse = await prisma.housePictures.update({
     where: { houseId },
     data: { imgUrl: updatedArray },
   });
@@ -106,7 +104,7 @@ export const deleteHouseImgService = async (
 
 //delete a house
 export const deleteHouseService = async (houseId: string) => {
-  const deletedHouse = await client.houses.update({
+  const deletedHouse = await prisma.houses.update({
     where: { id: houseId },
     data: { isDeleted: true },
   });
@@ -115,17 +113,15 @@ export const deleteHouseService = async (houseId: string) => {
 };
 
 //search for a house
-export const getHouseService = async (
-   data: {
-    houseId?: string | undefined;
-    landloardId?: string | undefined;
-    name?: string | undefined;
-    roomType?: string | undefined;
-    description?: string | undefined;
-    wifi?: boolean | undefined;
-}
-) => {
-  const getHouse = await client.houses.findMany({
+export const getHouseService = async (data: {
+  houseId?: string | undefined;
+  landloardId?: string | undefined;
+  name?: string | undefined;
+  roomType?: string | undefined;
+  description?: string | undefined;
+  wifi?: boolean | undefined;
+}) => {
+  const getHouse = await prisma.houses.findMany({
     where: {
       OR: [
         { id: data.houseId },
@@ -143,52 +139,49 @@ export const getHouseService = async (
   return getHouse;
 };
 
-
 // add review
-export const addReviewService = async (data:Prisma.reviewCreateInput)=> {
-  const newReview = await client.review.create({data})
+export const addReviewService = async (data: addReviewType) => {
+  const newReview = await prisma.review.create({ data });
   if (!newReview) return Promise.reject(new Error("review not added"));
   return newReview;
-}
+};
 
 // get reviews for a house
 export const getReviewsService = async (id: string) => {
-  const reviews = await client.review.findMany({
-    where: { OR:[
-     { id:id},
-     {userId:id},
-     {houseId:id} 
-    ] },
+  const reviews = await prisma.review.findMany({
+    where: { OR: [{ id: id }, { userId: id }, { houseId: id }] },
   });
   if (!reviews) return Promise.reject(new Error("no reviews found"));
   return reviews;
-}
+};
 
 // delete review
 export const deleteReviewService = async (reviewId: string) => {
-  const deletedReview = await client.review.update({
+  const deletedReview = await prisma.review.update({
     where: { id: reviewId },
     data: { isDeleted: true },
   });
   if (!deletedReview) return Promise.reject(new Error("review not deleted"));
   return deletedReview;
-}
+};
 
 // update review
-export const updateReviewService = async (data: Prisma.reviewUncheckedUpdateInput) => {
-  const updatedReview = await client.review.update({
-    where: { id: data.id as string },
-    data: data,
+export const updateReviewService = async (data: UpdateReviewType) => {
+  const { id, ...others } = data;
+  const updatedReview = await prisma.review.update({
+    where: { id: data.id },
+    data: others,
   });
   if (!updatedReview) return Promise.reject(new Error("review not updated"));
   return updatedReview;
-}
+};
 
 // get all reviews for a user
 export const getUserReviewsService = async (userId: string) => {
-  const reviews = await client.review.findMany({
+  const reviews = await prisma.review.findMany({
     where: { userId },
   });
-  if (!reviews) return Promise.reject(new Error("no reviews found for this user"));
+  if (!reviews)
+    return Promise.reject(new Error("no reviews found for this user"));
   return reviews;
-}
+};

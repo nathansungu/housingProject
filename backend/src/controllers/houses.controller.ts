@@ -29,7 +29,6 @@ import {
   getReviewsValidation,
   updateReviewValidation,
 } from "../zodValidation/reviews";
-
 export const addHouses = asyncHandler(async (req: Request, res: Response) => {
   const data = await addHouseValidation.parseAsync(req.body);
   const landlordId = req.user?.userId!;
@@ -41,13 +40,10 @@ export const addHouses = asyncHandler(async (req: Request, res: Response) => {
 
 export const updateHouse = asyncHandler(async (req: Request, res: Response) => {
   const data = await updateHouseValidation.parseAsync(req.body);
-  const landlordId = req.user?.userId;
-  const houseId = req.params.housesInclude;
-  const updatedHouse = await updateHouseService({
-    ...data,
-    landlordId,
-    id: houseId,
-  });
+  const landlordId = req.user?.userId ;
+
+  const houseId = req.params.housesId as string;
+  const updatedHouse = await updateHouseService({ ...data, id:houseId });
   if (updatedHouse)
     res
       .status(200)
@@ -91,7 +87,7 @@ export const updateHousePictures = asyncHandler(
 
 //delete a house
 export const deleteHouse = asyncHandler(async (req: Request, res: Response) => {
-  const houseId = req.params.houseId;
+  const houseId = req.params.houseId as string;
   const landlordId = req.user?.userId;
 
   const deletedHouse = await deleteHouseService(houseId);

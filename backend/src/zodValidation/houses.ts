@@ -17,16 +17,16 @@ export const addHouseValidation = z.object({
 })
 
 export const updateHouseValidation = z.object({
-    landloardId: z.string(),
+    landlordId: z.string(),
     name: z.string().optional(),
     roomType: z.string().optional(),
     roomsNumber: z.int().optional(),
     vacantUnits: z.int().optional(),
     location: z.string().optional(),
     description: z.string().optional(),
-    price: z.int().optional(),
+    pricing: z.int().optional(),
     waterBill: z.boolean().optional(),
-    electictBill: z.boolean().optional(),
+    electricBill: z.boolean().optional(),
     wifi: z.boolean().optional(),
     rentDeadline: z.string().optional(),
     status: z.string().optional(),
@@ -43,6 +43,7 @@ export const updateHousePicturesValidation = z.object({
     houseId: z.string(),
     currentImgUrl: z.string(),
     newImgUrl: z.string()
+    
 })
 
 //delete imgUrl 

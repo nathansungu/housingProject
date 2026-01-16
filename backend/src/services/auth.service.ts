@@ -1,14 +1,8 @@
-import Prisma from "@prisma/client";
+import prisma from "../prismaClient";
 import { hash, compare } from "bcrypt";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
-const client = new Prisma.PrismaClient();
-type RegisterUserInput = {
-  email: string;
-  firstName: string;
-  lastName: string;
-  userName: string;
-  password: string;
-};
+import { RegisterUserInput } from "../../@types/users";
+
 export const registerUserService = async ({
   email,
   firstName,
@@ -17,7 +11,7 @@ export const registerUserService = async ({
   password,
 }: RegisterUserInput) => {
   const bcryptPassword = await hash(password, 10);
-  const newUser = await client.auth.create({
+  const newUser = await prisma.auth.create({
     data: {
       email,
       userName,
@@ -42,7 +36,7 @@ export const loginUserService = async (
   identifier: string,
   password: string
 ) => {
-  const isValidUser = await client.auth.findFirst({
+  const isValidUser = await prisma.auth.findFirst({
 
     where: { OR: [{ email: identifier }, { userName: identifier }]},include: { user: true }
   });
@@ -83,7 +77,7 @@ export const refreshTokenService = (refreshToken: string) => {
 };
 
 export const getUserService = async (userId: string) => {
-  const user = await client.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
       id: true,
@@ -118,14 +112,14 @@ export const changePasswordService = async (
   newPassword: string,
   currentPassword: string
 ) => {
-  const user = await client.auth.findUnique({
+  const user = await prisma.auth.findUnique({
     where: { id: userId },
   });
   if (!user) return Promise.reject(new Error("invalid credentials"));
   const isValid = await compare(currentPassword, user!.password);
   if (!isValid) return Promise.reject(new Error("invalid credentials"));
   const passwordHash = await hash(newPassword, 10);
-  const auth = await client.auth.update({
+  const auth = await prisma.auth.update({
     where: { id: userId },
     data: { password: passwordHash },
   });
@@ -134,7 +128,7 @@ export const changePasswordService = async (
 
 
 export const forgotPasswordService = async (identifier: string) => {
-  const user = await client.auth.findFirst({
+  const user = await prisma.auth.findFirst({
     where: { OR: [{ email: identifier }, { userName: identifier }] },
   });
   if (!user) return Promise.reject(new Error("no such user found"));

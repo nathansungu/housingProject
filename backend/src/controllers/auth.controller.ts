@@ -7,10 +7,7 @@ import {
 } from "./../zodValidation/authentication";
 import { asyncHandler } from "../utilities/asyncHandler";
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { changePasswordService, loginUserService, refreshTokenService, registerUserService } from "../services/auth.service";
-
-const client = new PrismaClient();
 
 export const registerUser = asyncHandler(
   async (req: Request, res: Response) => {

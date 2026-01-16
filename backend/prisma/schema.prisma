@@ -1,9 +1,11 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+
 }
 
 model auth {
@@ -132,4 +134,5 @@ model messages {
   receiver user   @relation("ReceivedMessages", fields: [receiverId], references: [id])
   house    houses? @relation(fields: [houseId], references: [id])
 }
+
 
